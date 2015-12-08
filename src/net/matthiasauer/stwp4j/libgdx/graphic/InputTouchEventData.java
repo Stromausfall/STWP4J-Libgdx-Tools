@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Pool.Poolable;
 
-class InputTouchEventData implements Poolable {
+public class InputTouchEventData implements Poolable {
     private final Vector2 projected = new Vector2();
     private final Vector2 unprojected = new Vector2();
     private final Vector3 temp = new Vector3();
