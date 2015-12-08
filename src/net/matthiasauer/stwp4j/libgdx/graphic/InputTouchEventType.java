@@ -1,6 +1,6 @@
 package net.matthiasauer.stwp4j.libgdx.graphic;
 
-enum InputTouchEventType {
+public enum InputTouchEventType {
     TouchDown,
     TouchUp,
     Moved,

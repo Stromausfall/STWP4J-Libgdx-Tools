@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pools;
 
+import net.matthiasauer.stwp4j.ChannelOutPort;
 import net.matthiasauer.stwp4j.libgdx.utils.InputTools;
 
 class InteractionSubProcess implements InputProcessor {
@@ -43,26 +44,14 @@ class InteractionSubProcess implements InputProcessor {
         this.renderedData.add(data);
     }
 
-    public void postIteration() {
+    public void postIteration(ChannelOutPort<InputTouchEventData> outPort) {
         this.lastTouchedEntity = null;
 
         for (InputTouchEventData eventToProcess : this.lastEvents) {
-            String touchedEntity = this.iterateOverAllEntitiesToFindTouched(eventToProcess);
-            /*
-             * Gdx.app.debug( "InputTouchGeneratorSystem",
-             * eventToProcess.inputType + " - " + eventToProcess.target);
-             */
-
-            // System.err.println("event - " + eventToProcess.inputType + " @
-            // x/y:" + eventToProcess.screenX + "/" + eventToProcess.screenY + "
-            // on entity : " + touchedEntity);
-            if (touchedEntity != null) {
-                System.err.println("event - " + eventToProcess.getInputTouchEventType() + "("
-                        + eventToProcess.getArgument() + ") on entity : " + touchedEntity);
-            }
-
-            // eventToProcess.target = touchedEntity;
-            Pools.get(InputTouchEventData.class).free(eventToProcess);
+            // find the entity that is touched by the event
+            this.iterateOverAllEntitiesToFindTouched(eventToProcess);
+            
+            outPort.offer(eventToProcess);
         }
 
         this.lastEvents.clear();
@@ -176,6 +165,8 @@ class InteractionSubProcess implements InputProcessor {
                 final String id = renderedEvent.getRenderData().getId();
 
                 if (renderOrder > orderOfCurrentTarget) {
+                    eventData.setProjected(renderedEvent.getRenderData().isRenderProjected());
+                    eventData.setTouchedRenderDataId(renderedEvent.getRenderData().getId());
                     orderOfCurrentTarget = renderOrder;
                     touchedEntity = id;
                 }

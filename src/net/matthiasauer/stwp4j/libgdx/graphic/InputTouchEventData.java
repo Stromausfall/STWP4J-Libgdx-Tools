@@ -10,6 +10,8 @@ class InputTouchEventData implements Poolable {
     private final Vector2 projected = new Vector2();
     private final Vector2 unprojected = new Vector2();
     private final Vector3 temp = new Vector3();
+    private boolean isProjected;
+    private String touchedRenderDataId;
     private int screenX;
     private int screenY;
     private InputTouchEventType inputType;
@@ -47,6 +49,14 @@ class InputTouchEventData implements Poolable {
         unprojected.x = screenX - (Gdx.graphics.getWidth() / 2);
         unprojected.y = (Gdx.graphics.getHeight() / 2) - screenY;
     }
+    
+    public boolean isProjected() {
+        return this.isProjected;
+    }
+    
+    public void setProjected(boolean isProjected) {
+        this.isProjected = isProjected;
+    }
 
     public Vector2 getPosition(boolean isProjected) {
         if (isProjected) {
@@ -54,6 +64,14 @@ class InputTouchEventData implements Poolable {
         } else {
             return this.unprojected;
         }
+    }
+    
+    public void setTouchedRenderDataId(String touchedRenderDataId) {
+        this.touchedRenderDataId = touchedRenderDataId;
+    }
+    
+    public String getTouchedRenderDataId() {
+        return this.touchedRenderDataId;
     }
 
     @Override
@@ -64,5 +82,7 @@ class InputTouchEventData implements Poolable {
         this.argument = 0;
         this.projected.set(0, 0);
         this.unprojected.set(0, 0);
+        this.isProjected = false;
+        this.touchedRenderDataId = null;
     }
 }
