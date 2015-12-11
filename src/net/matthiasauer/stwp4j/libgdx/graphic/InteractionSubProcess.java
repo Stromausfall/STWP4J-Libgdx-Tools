@@ -62,8 +62,10 @@ class InteractionSubProcess implements InputProcessor {
                 touchedRenderedData = this.iterateOverAllEntitiesToFindTouched(eventToProcess);
             }
 
-            eventToProcess.setProjected(touchedRenderedData.getRenderData().isRenderProjected());
-            eventToProcess.setTouchedRenderDataId(touchedRenderedData.getRenderData().getId());
+            if (touchedRenderedData != null) {
+                eventToProcess.setProjected(touchedRenderedData.getRenderData().isRenderProjected());
+                eventToProcess.setTouchedRenderDataId(touchedRenderedData.getRenderData().getId());
+            }
 
             outPort.offer(eventToProcess);
         }
