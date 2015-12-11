@@ -5,12 +5,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Pools;
 
 import net.matthiasauer.stwp4j.ChannelOutPort;
@@ -21,12 +23,18 @@ class InteractionSubProcess implements InputProcessor {
     private final Set<RenderedData> renderedData;
     private final Camera camera;
     private final RenderTextureArchiveSystem archive;
+    private final Vector3 temp;
+    private final Vector2 projected;
+    private final Vector2 unprojected;
 
     public InteractionSubProcess(Camera camera) {
         this.archive = new RenderTextureArchiveSystem();
         this.renderedData = new HashSet<RenderedData>();
         this.lastEvents = new ArrayList<InputTouchEventData>();
         this.camera = camera;
+        this.temp = new Vector3();
+        this.projected = new Vector2();
+        this.unprojected = new Vector2();
 
         // register this process as an input processor
         InputTools.addInputProcessor(this);
@@ -45,12 +53,18 @@ class InteractionSubProcess implements InputProcessor {
     }
 
     public void postIteration(ChannelOutPort<InputTouchEventData> outPort) {
-        this.lastTouchedEntity = null;
+        RenderedData touchedRenderedData = null;
 
         for (InputTouchEventData eventToProcess : this.lastEvents) {
-            // find the entity that is touched by the event
-            this.iterateOverAllEntitiesToFindTouched(eventToProcess);
-            
+
+            if (touchedRenderedData == null) {
+                // find the entity that is touched by the event
+                touchedRenderedData = this.iterateOverAllEntitiesToFindTouched(eventToProcess);
+            }
+
+            eventToProcess.setProjected(touchedRenderedData.getRenderData().isRenderProjected());
+            eventToProcess.setTouchedRenderDataId(touchedRenderedData.getRenderData().getId());
+
             outPort.offer(eventToProcess);
         }
 
@@ -143,37 +157,25 @@ class InteractionSubProcess implements InputProcessor {
         return false;
     }
 
-    private String lastTouchedEntity;
-
-    private String iterateOverAllEntitiesToFindTouched(InputTouchEventData eventData) {
+    private RenderedData iterateOverAllEntitiesToFindTouched(InputTouchEventData eventData) {
         int orderOfCurrentTarget = -1;
-        String touchedEntity = null;
-
-        // we only need to get the entity once - because the mouse is at the
-        // same position
-        // at the moment of time
-        if (this.lastTouchedEntity != null) {
-            return this.lastTouchedEntity;
-        }
+        RenderedData touchedRenderedData = null;
 
         // go over all entities
-        for (RenderedData renderedEvent : this.renderedData) {
+        for (RenderedData renderedData : this.renderedData) {
             // search for the one that is touched and has the highest order of
             // the layer
-            if (this.touchesVisiblePartOfTarget(eventData, renderedEvent)) {
-                final int renderOrder = renderedEvent.getRenderData().getRenderOrder();
-                final String id = renderedEvent.getRenderData().getId();
+            if (this.touchesVisiblePartOfTarget(eventData, renderedData)) {
+                final int renderOrder = renderedData.getRenderData().getRenderOrder();
 
                 if (renderOrder > orderOfCurrentTarget) {
-                    eventData.setProjected(renderedEvent.getRenderData().isRenderProjected());
-                    eventData.setTouchedRenderDataId(renderedEvent.getRenderData().getId());
+                    touchedRenderedData = renderedData;
                     orderOfCurrentTarget = renderOrder;
-                    touchedEntity = id;
                 }
             }
         }
 
-        return touchedEntity;
+        return touchedRenderedData;
     }
 
     private boolean isClickedPixelVisible(Rectangle renderedRectangle, AtlasRegion spriteTexture, Vector2 position) {
@@ -216,10 +218,25 @@ class InteractionSubProcess implements InputProcessor {
         return false;
     }
 
+    private void calculatePositions(Camera camera, int screenX, int screenY) {
+        temp.x = screenX;
+        temp.y = screenY;
+        temp.z = 0;
+
+        camera.unproject(temp);
+
+        projected.x = temp.x;
+        projected.y = temp.y;
+        unprojected.x = screenX - (Gdx.graphics.getWidth() / 2);
+        unprojected.y = (Gdx.graphics.getHeight() / 2) - screenY;
+    }
+
     private void saveEvent(int screenX, int screenY, InputTouchEventType inputType, int argument) {
         InputTouchEventData event = Pools.get(InputTouchEventData.class).obtain();
 
-        event.set(screenX, screenY, inputType, argument, this.camera);
+        this.calculatePositions(camera, screenX, screenY);
+
+        event.set(inputType, argument, this.projected, this.unprojected);
 
         this.lastEvents.add(event);
     }
