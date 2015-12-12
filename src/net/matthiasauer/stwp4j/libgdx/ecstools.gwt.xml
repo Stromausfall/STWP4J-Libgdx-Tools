@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit trunk//EN" "http://google-web-toolkit.googlecode.com/svn/trunk/distro-source/core/src/gwt-module.dtd">
+<module>
+	<source path="ecstools" />
+	
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.graphics.RenderComponent" />
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.graphics.RenderedComponent" />
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.graphics.RenderPositionUnit" />
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.graphics.RenderType" />
+	
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.graphics.camera.move.MoveEventComponent" />
+	
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.graphics.camera.zoom.ZoomEventComponent" />
+	
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.graphics.texture.archive.RenderTextureArchiveEntryComponent" />
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.graphics.texture.archive.RenderTextureArchiveEventComponent" />
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.graphics.texture.archive.RenderTextureArchiveEventType" />
+	
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.input.base.gestures.InputGestureEventComponent" />
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.input.base.gestures.InputGestureEventType" />
+	
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.input.base.simple.InputSimpleEventComponent" />
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.input.base.simple.InputSimpleEventType" />
+	
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.input.base.touch.InputTouchEventComponent" />
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.input.base.touch.InputTouchEventType" />
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.input.base.touch.InputTouchTargetComponent" />
+	
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.input.click.ClickableComponent" />
+	<extend-configuration-property name="gdx.reflect.include" value="net.matthiasauer.ecstools.input.click.ClickedComponent" />
+</module>
