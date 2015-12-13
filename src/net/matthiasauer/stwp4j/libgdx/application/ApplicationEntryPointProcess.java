@@ -1,7 +1,7 @@
 package net.matthiasauer.stwp4j.libgdx.application;
 
+import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import com.badlogic.gdx.ApplicationListener;
 
@@ -16,7 +16,7 @@ import net.matthiasauer.stwp4j.Scheduler;
 public abstract class ApplicationEntryPointProcess extends LightweightProcess implements ApplicationListener {
     public static final String APPLICATION_EVENT_CHANNEL = "applicationevent-channel";
     protected final Scheduler scheduler = new Scheduler();
-    private final Queue<ApplicationEvent> occuredEvents = new LinkedBlockingQueue<ApplicationEvent>();
+    private final Queue<ApplicationEvent> occuredEvents = new ArrayDeque<ApplicationEvent>();
     private long lastTimestep = System.currentTimeMillis();
     private ChannelOutPort<ApplicationEvent> applicationEventChannel;
 
