@@ -3,7 +3,7 @@ package net.matthiasauer.stwp4j.libgdx.graphic;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Rectangle;
 
-class RenderedData {
+public class RenderedData {
 	private final Rectangle renderedTarget = new Rectangle();
 	private float zoomFactor;
 	private RenderData renderData;
