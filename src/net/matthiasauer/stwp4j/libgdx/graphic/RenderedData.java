@@ -9,9 +9,6 @@ public class RenderedData {
 	private RenderData renderData;
 	private AtlasRegion texture;
 	
-	RenderedData() {
-    }
-	
 	public RenderedData set(float x, float y, float width, float height, float zoomFactor, RenderData renderData, AtlasRegion texture) {
 		this.renderedTarget.x = x;
 		this.renderedTarget.y = y;
