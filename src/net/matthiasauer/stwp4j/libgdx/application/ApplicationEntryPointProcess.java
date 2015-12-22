@@ -8,7 +8,6 @@ import com.badlogic.gdx.ApplicationListener;
 import net.matthiasauer.stwp4j.ChannelOutPort;
 import net.matthiasauer.stwp4j.ChannelPortsCreated;
 import net.matthiasauer.stwp4j.ChannelPortsRequest;
-import net.matthiasauer.stwp4j.ExecutionState;
 import net.matthiasauer.stwp4j.LightweightProcess;
 import net.matthiasauer.stwp4j.PortType;
 import net.matthiasauer.stwp4j.Scheduler;
@@ -62,13 +61,13 @@ public abstract class ApplicationEntryPointProcess extends LightweightProcess im
     }
 
     @Override
-    protected final ExecutionState execute() {
+    protected final void execute() {
         // forward ALL events
         for (ApplicationEvent applicationEvent : this.occuredEvents) {
             applicationEventChannel.offer(applicationEvent);
         }
         
-        return ExecutionState.Finished;
+        this.occuredEvents.clear();
     }
 
     @Override
