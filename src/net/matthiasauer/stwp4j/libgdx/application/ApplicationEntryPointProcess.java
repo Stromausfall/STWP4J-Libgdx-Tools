@@ -6,26 +6,18 @@ import java.util.Queue;
 import com.badlogic.gdx.ApplicationListener;
 
 import net.matthiasauer.stwp4j.ChannelOutPort;
-import net.matthiasauer.stwp4j.ChannelPortsCreated;
-import net.matthiasauer.stwp4j.ChannelPortsRequest;
 import net.matthiasauer.stwp4j.LightweightProcess;
-import net.matthiasauer.stwp4j.PortType;
 import net.matthiasauer.stwp4j.Scheduler;
 
 public abstract class ApplicationEntryPointProcess extends LightweightProcess implements ApplicationListener {
     public static final String APPLICATION_EVENT_CHANNEL = "applicationevent-channel";
     protected final Scheduler scheduler = new Scheduler();
     private final Queue<ApplicationEvent> occuredEvents = new LinkedList<ApplicationEvent>();
+    private final ChannelOutPort<ApplicationEvent> applicationEventChannel;
     private long lastTimestep = System.currentTimeMillis();
-    private ChannelOutPort<ApplicationEvent> applicationEventChannel;
 
-    protected ApplicationEntryPointProcess() {
-        super(
-                new ChannelPortsRequest<ApplicationEvent>(
-                        APPLICATION_EVENT_CHANNEL,
-                        PortType.OutputExclusive,
-                        ApplicationEvent.class));
-        
+    protected ApplicationEntryPointProcess(ChannelOutPort<ApplicationEvent> applicationEventChannel) {
+        this.applicationEventChannel = applicationEventChannel;
         this.scheduler.addProcess(this);
     }
 
@@ -68,10 +60,5 @@ public abstract class ApplicationEntryPointProcess extends LightweightProcess im
         }
         
         this.occuredEvents.clear();
-    }
-
-    @Override
-    protected final void initialize(ChannelPortsCreated createdChannelPorts) {
-        this.applicationEventChannel = createdChannelPorts.getChannelOutPort(APPLICATION_EVENT_CHANNEL, ApplicationEvent.class);
     }
 }

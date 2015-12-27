@@ -13,11 +13,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import net.matthiasauer.stwp4j.ChannelInPort;
 import net.matthiasauer.stwp4j.ChannelOutPort;
-import net.matthiasauer.stwp4j.ChannelPortsCreated;
-import net.matthiasauer.stwp4j.ChannelPortsRequest;
 import net.matthiasauer.stwp4j.LightweightProcess;
-import net.matthiasauer.stwp4j.PortType;
-import net.matthiasauer.stwp4j.libgdx.application.ApplicationEntryPointProcess;
 import net.matthiasauer.stwp4j.libgdx.application.ApplicationEvent;
 import net.matthiasauer.stwp4j.libgdx.application.ApplicationEventType;
 import net.matthiasauer.stwp4j.libgdx.application.ResizeApplicationEvent;
@@ -37,9 +33,9 @@ public final class RenderProcess extends LightweightProcess {
     private final Viewport viewport;
     private final InteractionSubProcess interactionSubProcess;
     private final boolean createInputTouchEvents;
-    private ChannelInPort<RenderData> renderDataChannel;
-    private ChannelInPort<ApplicationEvent> applicationEventChannel;
-    private ChannelOutPort<InputTouchEventData> inputTouchEventDataChannel;
+    private final ChannelInPort<RenderData> renderDataChannel;
+    private final ChannelInPort<ApplicationEvent> applicationEventChannel;
+    private final ChannelOutPort<InputTouchEventData> inputTouchEventDataChannel;
 
     /**
      * Creates the RenderProcess
@@ -50,12 +46,12 @@ public final class RenderProcess extends LightweightProcess {
      *            indicates whether InputTouchEvents should be created submitted
      *            to the RENDERDATA_CHANNEL channel
      */
-    public RenderProcess(List<String> atlasFilePaths, boolean createInputTouchEvents) {
-        super(new ChannelPortsRequest<RenderData>(RENDERDATA_CHANNEL, PortType.InputExclusive, RenderData.class),
-                new ChannelPortsRequest<ApplicationEvent>(ApplicationEntryPointProcess.APPLICATION_EVENT_CHANNEL,
-                        PortType.InputMultiplex, ApplicationEvent.class),
-                new ChannelPortsRequest<InputTouchEventData>(INPUTTOUCHEVENTDATA_CHANNEL, PortType.OutputExclusive,
-                        InputTouchEventData.class));
+    public RenderProcess(List<String> atlasFilePaths, boolean createInputTouchEvents,
+            ChannelInPort<RenderData> renderDataChannel, ChannelInPort<ApplicationEvent> applicationEventChannel,
+            ChannelOutPort<InputTouchEventData> inputTouchEventDataChannel) {
+        this.renderDataChannel = renderDataChannel;
+        this.applicationEventChannel = applicationEventChannel;
+        this.inputTouchEventDataChannel = inputTouchEventDataChannel;
 
         this.createInputTouchEvents = createInputTouchEvents;
         this.camera = new OrthographicCamera(800, 600);
@@ -96,15 +92,6 @@ public final class RenderProcess extends LightweightProcess {
     protected void execute() {
         this.handleRenderDataChannel();
         this.handleApplicationEventChannel();
-    }
-
-    @Override
-    protected void initialize(ChannelPortsCreated createdChannelPorts) {
-        this.renderDataChannel = createdChannelPorts.getChannelInPort(RENDERDATA_CHANNEL, RenderData.class);
-        this.applicationEventChannel = createdChannelPorts
-                .getChannelInPort(ApplicationEntryPointProcess.APPLICATION_EVENT_CHANNEL, ApplicationEvent.class);
-        this.inputTouchEventDataChannel = createdChannelPorts.getChannelOutPort(INPUTTOUCHEVENTDATA_CHANNEL,
-                InputTouchEventData.class);
     }
 
     @Override
