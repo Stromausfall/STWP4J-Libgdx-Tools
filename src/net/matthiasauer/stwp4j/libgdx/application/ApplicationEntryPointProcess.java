@@ -18,7 +18,7 @@ public abstract class ApplicationEntryPointProcess extends LightweightProcess im
     private final ChannelOutPort<ApplicationEvent> applicationEventChannelOutPort;
     private long lastTimestep = System.currentTimeMillis();
 
-    protected ApplicationEntryPointProcess(ChannelOutPort<ApplicationEvent> applicationEventChannel) {
+    protected ApplicationEntryPointProcess() {
         this.scheduler = new Scheduler();
         this.applicationEventChannel = this.scheduler.createSharedChannel(APPLICATION_EVENT_CHANNEL, ApplicationEvent.class);
         this.applicationEventChannelOutPort = this.applicationEventChannel.createOutPort();
