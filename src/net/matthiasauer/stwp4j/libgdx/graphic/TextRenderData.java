@@ -1,8 +1,9 @@
 package net.matthiasauer.stwp4j.libgdx.graphic;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Pool.Poolable;
 
-public final class TextRenderData extends RenderData {
+public final class TextRenderData extends RenderData implements Poolable {
     private String textString;
     private String textFont;
 
@@ -28,5 +29,10 @@ public final class TextRenderData extends RenderData {
     
     public String getTextFont() {
         return this.textFont;
+    }
+
+    @Override
+    public void reset() {
+        this.set(null, 0, 0, 0, null, null, 0, false, null, null);
     }
 }
