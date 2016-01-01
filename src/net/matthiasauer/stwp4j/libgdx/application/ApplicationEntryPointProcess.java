@@ -13,14 +13,17 @@ import net.matthiasauer.stwp4j.Scheduler;
 public abstract class ApplicationEntryPointProcess extends LightweightProcess implements ApplicationListener {
     public static final String APPLICATION_EVENT_CHANNEL = "applicationevent-channel";
     protected final Scheduler scheduler;
-    protected final Channel<ApplicationEvent> applicationEventChannel; 
+    protected final Channel<ApplicationEvent> applicationEventChannel;
     private final Queue<ApplicationEvent> occuredEvents = new LinkedList<ApplicationEvent>();
     private final ChannelOutPort<ApplicationEvent> applicationEventChannelOutPort;
     private long lastTimestep = System.currentTimeMillis();
 
-    protected ApplicationEntryPointProcess() {
+    protected ApplicationEntryPointProcess(boolean applicationEventChannelMustBeEmptyAfterEachIteration,
+            boolean applicationEventChannelAllowsMessagesWithoutHavingInPorts) {
         this.scheduler = new Scheduler();
-        this.applicationEventChannel = this.scheduler.createSharedChannel(APPLICATION_EVENT_CHANNEL, ApplicationEvent.class);
+        this.applicationEventChannel = this.scheduler.createSharedChannel(APPLICATION_EVENT_CHANNEL,
+                ApplicationEvent.class, applicationEventChannelMustBeEmptyAfterEachIteration,
+                applicationEventChannelAllowsMessagesWithoutHavingInPorts);
         this.applicationEventChannelOutPort = this.applicationEventChannel.createOutPort();
         this.scheduler.addProcess(this);
     }
@@ -35,9 +38,9 @@ public abstract class ApplicationEntryPointProcess extends LightweightProcess im
         long current = System.currentTimeMillis();
         long difference = current - lastTimestep;
         lastTimestep = current;
-        
+
         this.occuredEvents.add(new RenderApplicationEvent().set(difference / 1000d));
-        
+
         this.scheduler.performIteration();
     }
 
@@ -62,7 +65,7 @@ public abstract class ApplicationEntryPointProcess extends LightweightProcess im
         for (ApplicationEvent applicationEvent : this.occuredEvents) {
             applicationEventChannelOutPort.offer(applicationEvent);
         }
-        
+
         this.occuredEvents.clear();
     }
 }
