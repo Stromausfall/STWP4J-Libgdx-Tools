@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 public final class SpriteRenderData extends RenderData implements Poolable {
     private String textureName;
 
-    public void set(
+    public SpriteRenderData set(
             String id,
             float positionX,
             float positionY,
@@ -18,6 +18,8 @@ public final class SpriteRenderData extends RenderData implements Poolable {
             String textureName) {
         this.set(id, positionX, positionY, rotation, renderPositionUnit, tint, renderOrder, renderProjected);
         this.textureName = textureName;
+        
+        return this;
     }
     
     public String getTextureName() {

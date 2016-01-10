@@ -7,7 +7,7 @@ public final class TextRenderData extends RenderData implements Poolable {
     private String textString;
     private String textFont;
 
-    public void set(
+    public TextRenderData set(
             String id,
             float positionX,
             float positionY,
@@ -21,6 +21,8 @@ public final class TextRenderData extends RenderData implements Poolable {
         this.set(id, positionX, positionY, rotation, renderPositionUnit, tint, renderOrder, renderProjected);
         this.textString = textString;
         this.textFont = textFont;
+        
+        return this;
     }
     
     public String getTextString() {
