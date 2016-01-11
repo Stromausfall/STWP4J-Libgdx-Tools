@@ -35,7 +35,7 @@ public final class RenderProcess extends LightweightProcess {
     private final boolean createInputTouchEvents;
     private final ChannelInPort<RenderData> renderDataChannel;
     private final ChannelInPort<ApplicationEvent> applicationEventChannel;
-    private final ChannelOutPort<InputTouchEventData> inputTouchEventDataChannel;
+    private final ChannelOutPort<InputTouchEvent> inputTouchEventDataChannel;
 
     /**
      * Creates the RenderProcess
@@ -48,7 +48,7 @@ public final class RenderProcess extends LightweightProcess {
      */
     public RenderProcess(List<String> atlasFilePaths, boolean createInputTouchEvents,
             ChannelInPort<RenderData> renderDataChannel, ChannelInPort<ApplicationEvent> applicationEventChannel,
-            ChannelOutPort<InputTouchEventData> inputTouchEventDataChannel) {
+            ChannelOutPort<InputTouchEvent> inputTouchEventDataChannel) {
         this.renderDataChannel = renderDataChannel;
         this.applicationEventChannel = applicationEventChannel;
         this.inputTouchEventDataChannel = inputTouchEventDataChannel;

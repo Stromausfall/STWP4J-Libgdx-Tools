@@ -19,7 +19,7 @@ import net.matthiasauer.stwp4j.ChannelOutPort;
 import net.matthiasauer.stwp4j.libgdx.utils.InputTools;
 
 class InteractionSubProcess implements InputProcessor {
-    private final Collection<InputTouchEventData> lastEvents;
+    private final Collection<InputTouchEvent> lastEvents;
     private final Set<RenderedData> renderedData;
     private final Camera camera;
     private final RenderTextureArchiveSystem archive;
@@ -30,7 +30,7 @@ class InteractionSubProcess implements InputProcessor {
     public InteractionSubProcess(Camera camera) {
         this.archive = new RenderTextureArchiveSystem();
         this.renderedData = new HashSet<RenderedData>();
-        this.lastEvents = new ArrayList<InputTouchEventData>();
+        this.lastEvents = new ArrayList<InputTouchEvent>();
         this.camera = camera;
         this.temp = new Vector3();
         this.projected = new Vector2();
@@ -52,10 +52,10 @@ class InteractionSubProcess implements InputProcessor {
         this.renderedData.add(data);
     }
 
-    public void postIteration(ChannelOutPort<InputTouchEventData> outPort) {
+    public void postIteration(ChannelOutPort<InputTouchEvent> outPort) {
         RenderedData touchedRenderedData = null;
 
-        for (InputTouchEventData eventToProcess : this.lastEvents) {
+        for (InputTouchEvent eventToProcess : this.lastEvents) {
 
             if (touchedRenderedData == null) {
                 // find the entity that is touched by the event
@@ -122,7 +122,7 @@ class InteractionSubProcess implements InputProcessor {
         return arrow;
     }
 
-    private boolean touchesVisiblePartOfTarget(InputTouchEventData eventData, RenderedData renderedData) {
+    private boolean touchesVisiblePartOfTarget(InputTouchEvent eventData, RenderedData renderedData) {
         final RenderData renderData = renderedData.getRenderData();
         final Class<? extends RenderData> specializationType = renderData.getClass();
         boolean isProjected = renderData.isRenderProjected();
@@ -159,7 +159,7 @@ class InteractionSubProcess implements InputProcessor {
         return false;
     }
 
-    private RenderedData iterateOverAllEntitiesToFindTouched(InputTouchEventData eventData) {
+    private RenderedData iterateOverAllEntitiesToFindTouched(InputTouchEvent eventData) {
         int orderOfCurrentTarget = -1;
         RenderedData touchedRenderedData = null;
 
@@ -234,11 +234,11 @@ class InteractionSubProcess implements InputProcessor {
     }
 
     private void saveEvent(int screenX, int screenY, InputTouchEventType inputType, int argument) {
-        InputTouchEventData event = Pools.get(InputTouchEventData.class).obtain();
+        InputTouchEvent event = Pools.get(InputTouchEvent.class).obtain();
 
         this.calculatePositions(camera, screenX, screenY);
 
-        event.set(inputType, argument, this.projected, this.unprojected);
+        event.set(inputType, argument, Gdx.input.isTouched(), this.projected, this.unprojected);
 
         this.lastEvents.add(event);
     }
