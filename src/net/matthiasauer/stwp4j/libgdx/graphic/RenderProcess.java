@@ -8,6 +8,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -19,6 +21,22 @@ import net.matthiasauer.stwp4j.libgdx.application.ApplicationEventType;
 import net.matthiasauer.stwp4j.libgdx.application.ResizeApplicationEvent;
 
 public final class RenderProcess extends LightweightProcess {
+    public static enum ResizeBehavior {
+        /**
+         * Keep the resolution - resizing stretches the content
+         */
+        KeepResolution,
+        /**
+         * Changes the resolution - the absolute size of the displayed content
+         * stays the same
+         */
+        ChangeResolution,
+        /**
+         * Like KeepResolution but the aspect ratio is kept
+         */
+        KeepResolutionKeepAspect
+    }
+
     /**
      * 11 is the default size internally so start with that initial capacity
      */
@@ -36,6 +54,9 @@ public final class RenderProcess extends LightweightProcess {
     private final ChannelInPort<RenderData> renderDataChannel;
     private final ChannelInPort<ApplicationEvent> applicationEventChannel;
     private final ChannelOutPort<InputTouchEvent> inputTouchEventDataChannel;
+    private final ResizeBehavior resizeBehavior;
+    private final int initalCameraWidth;
+    private final int initalCameraHeight;
 
     /**
      * Creates the RenderProcess
@@ -45,16 +66,26 @@ public final class RenderProcess extends LightweightProcess {
      * @param createInputTouchEvents
      *            indicates whether InputTouchEvents should be created submitted
      *            to the RENDERDATA_CHANNEL channel
+     * @param initialCameraWidth
+     *            the initial width the camera will have
+     * @param initialCameraHeight
+     *            the initial height the camera will have
+     * @param resizeBehavior
+     *            determines the resize behavior
      */
-    public RenderProcess(List<String> atlasFilePaths, boolean createInputTouchEvents,
-            ChannelInPort<RenderData> renderDataChannel, ChannelInPort<ApplicationEvent> applicationEventChannel,
+    public RenderProcess(List<String> atlasFilePaths, boolean createInputTouchEvents, int initialCameraWidth,
+            int initialCameraHeight, ResizeBehavior resizeBehavior, ChannelInPort<RenderData> renderDataChannel,
+            ChannelInPort<ApplicationEvent> applicationEventChannel,
             ChannelOutPort<InputTouchEvent> inputTouchEventDataChannel) {
-        this.renderDataChannel = renderDataChannel;
-        this.applicationEventChannel = applicationEventChannel;
+        this.initalCameraHeight = initialCameraHeight;
+        this.initalCameraWidth = initialCameraWidth;
         this.inputTouchEventDataChannel = inputTouchEventDataChannel;
+        this.applicationEventChannel = applicationEventChannel;
+        this.renderDataChannel = renderDataChannel;
+        this.resizeBehavior = resizeBehavior;
 
         this.createInputTouchEvents = createInputTouchEvents;
-        this.camera = new OrthographicCamera(800, 600);
+        this.camera = new OrthographicCamera(this.initalCameraWidth, this.initalCameraHeight);
         this.viewport = new ScreenViewport(camera);
         this.spriteBatch = new SpriteBatch();
         this.interactionSubProcess = new InteractionSubProcess(this.camera);
@@ -83,7 +114,29 @@ public final class RenderProcess extends LightweightProcess {
             if (event.getApplicationEventType() == ApplicationEventType.RESIZE) {
                 ResizeApplicationEvent resizeEvent = (ResizeApplicationEvent) event;
 
-                this.viewport.update(resizeEvent.getWidth(), resizeEvent.getHeight());
+                switch (this.resizeBehavior) {
+                case KeepResolution:
+                    // do nothing
+                    break;
+                case ChangeResolution:
+                    // change resolution
+                    this.viewport.update(resizeEvent.getWidth(), resizeEvent.getHeight());
+                    break;
+                case KeepResolutionKeepAspect:
+                    // keep resolution but also keep the aspect
+                    Vector2 size = Scaling.fit.apply(this.initalCameraWidth, this.initalCameraHeight,
+                            resizeEvent.getWidth(), resizeEvent.getHeight());
+                    int viewportX = (int) (resizeEvent.getWidth() - size.x) / 2;
+                    int viewportY = (int) (resizeEvent.getHeight() - size.y) / 2;
+                    int viewportWidth = (int) size.x;
+                    int viewportHeight = (int) size.y;
+                    Gdx.gl.glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
+                    break;
+                default:
+                    break;
+                }
+                // this.viewport.update(resizeEvent.getWidth(),
+                // resizeEvent.getHeight());
             }
         }
     }
