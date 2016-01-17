@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Pools;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import net.matthiasauer.stwp4j.ChannelOutPort;
 import net.matthiasauer.stwp4j.libgdx.utils.InputTools;
@@ -26,8 +27,9 @@ class InteractionSubProcess implements InputProcessor {
     private final Vector3 temp;
     private final Vector2 projected;
     private final Vector2 unprojected;
+    private final Viewport viewPort;
 
-    public InteractionSubProcess(Camera camera) {
+    public InteractionSubProcess(Camera camera, Viewport viewPort) {
         this.archive = new RenderTextureArchiveSystem();
         this.renderedData = new HashSet<RenderedData>();
         this.lastEvents = new ArrayList<InputTouchEvent>();
@@ -35,6 +37,7 @@ class InteractionSubProcess implements InputProcessor {
         this.temp = new Vector3();
         this.projected = new Vector2();
         this.unprojected = new Vector2();
+        this.viewPort = viewPort;
 
         // register this process as an input processor
         InputTools.addInputProcessor(this);
@@ -81,8 +84,14 @@ class InteractionSubProcess implements InputProcessor {
 
             // 'unzoom' the rendered rectangle - because the
             // position is also 'unzoomed' (unprojected)
-            rectangle.x /= renderedComponent.getZoomFactor();
-            rectangle.y /= renderedComponent.getZoomFactor();
+
+            float zoomFactor = renderedComponent.getZoomFactor();
+            
+            rectangle.x /= zoomFactor;
+            rectangle.y /= zoomFactor;
+            
+            //rectangle.x /= renderedComponent.getZoomFactor();
+            //rectangle.y /= renderedComponent.getZoomFactor();
 
             return rectangle;
         }
@@ -126,8 +135,22 @@ class InteractionSubProcess implements InputProcessor {
         final RenderData renderData = renderedData.getRenderData();
         final Class<? extends RenderData> specializationType = renderData.getClass();
         boolean isProjected = renderData.isRenderProjected();
-        Vector2 position = eventData.getPosition(isProjected);
+        Vector2 position = new Vector2(eventData.getPosition(isProjected));
+        position.x /= this.viewPort.getScreenWidth() / this.viewPort.getWorldWidth();
+        position.y /= this.viewPort.getScreenHeight() / this.viewPort.getWorldHeight();
         Rectangle rectangle = this.getRectangle(isProjected, renderedData);
+
+        // if the mouse is beyond the screen (f.e. stretched but ratio is kept)
+        if (Math.abs(position.x) > Math.abs(this.camera.viewportWidth / 2)) {
+            // there can't be any entity because there is nothing rendered there !
+            return false;
+        }
+
+        // if the mouse is beyond the screen (f.e. stretched but ratio is kept)
+        if (Math.abs(position.y) > Math.abs(this.camera.viewportHeight / 2)) {
+            // there can't be any entity because there is nothing rendered there !
+            return false;
+        }
 
         if (renderData.getRotation() != 0) {
             // get a new 'rotated vector'

@@ -34,7 +34,11 @@ public final class RenderProcess extends LightweightProcess {
         /**
          * Like KeepResolution but the aspect ratio is kept
          */
-        KeepResolutionKeepAspect
+        KeepResolutionKeepAspect,
+        /**
+         * Like ChangeResolution but the aspect ratio is kept
+         */
+        ChangeResolutionKeepAspect
     }
 
     /**
@@ -88,10 +92,15 @@ public final class RenderProcess extends LightweightProcess {
         this.camera = new OrthographicCamera(this.initalCameraWidth, this.initalCameraHeight);
         this.viewport = new ScreenViewport(camera);
         this.spriteBatch = new SpriteBatch();
-        this.interactionSubProcess = new InteractionSubProcess(this.camera);
-        this.renderSpriteSubSystem = new RenderSpriteSubSystem(new TextureLoader(atlasFilePaths), this.camera,
-                this.spriteBatch, this.interactionSubProcess);
-        this.renderTextSubSystem = new RenderTextSubSystem(this.camera, this.spriteBatch, this.interactionSubProcess);
+        this.interactionSubProcess = new InteractionSubProcess(this.camera, this.viewport);
+        this.renderSpriteSubSystem = new RenderSpriteSubSystem(this.viewport, new TextureLoader(atlasFilePaths),
+                this.camera, this.spriteBatch, this.interactionSubProcess);
+        this.renderTextSubSystem = new RenderTextSubSystem(this.viewport, this.camera, this.spriteBatch,
+                this.interactionSubProcess);
+
+this.camera.zoom = 2;
+this.camera.update();
+
 
         // create the PriorityQueue with the custom comparator and an initial
         // size
@@ -117,6 +126,8 @@ public final class RenderProcess extends LightweightProcess {
                 switch (this.resizeBehavior) {
                 case KeepResolution:
                     // do nothing
+                    this.viewport.setWorldSize(this.initalCameraWidth, this.initalCameraHeight);
+                    this.viewport.setScreenSize(resizeEvent.getWidth(), resizeEvent.getHeight());
                     break;
                 case ChangeResolution:
                     // change resolution
@@ -130,13 +141,31 @@ public final class RenderProcess extends LightweightProcess {
                     int viewportY = (int) (resizeEvent.getHeight() - size.y) / 2;
                     int viewportWidth = (int) size.x;
                     int viewportHeight = (int) size.y;
-                    Gdx.gl.glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
+
+                    this.viewport.setScreenPosition(viewportX, viewportY);
+                    this.viewport.setScreenSize(viewportWidth, viewportHeight);
+                    this.viewport.setWorldSize(this.initalCameraWidth, this.initalCameraHeight);
+                    this.viewport.apply(true);
+                    
+                    break;
+                case ChangeResolutionKeepAspect:
+                    // change resolution but also keep the aspect
+                    Vector2 size2 = Scaling.fit.apply(this.initalCameraWidth, this.initalCameraHeight,
+                            resizeEvent.getWidth(), resizeEvent.getHeight());
+                    int viewportX2 = (int) (resizeEvent.getWidth() - size2.x) / 2;
+                    int viewportY2 = (int) (resizeEvent.getHeight() - size2.y) / 2;
+                    int viewportWidth2 = (int) size2.x;
+                    int viewportHeight2 = (int) size2.y;
+
+                    this.viewport.setScreenPosition(viewportX2, viewportY2);
+                    this.viewport.setScreenSize(viewportWidth2, viewportHeight2);
+                    this.viewport.setWorldSize(viewportWidth2, viewportHeight2);
+                    this.viewport.apply(true);
+                    
                     break;
                 default:
                     break;
                 }
-                // this.viewport.update(resizeEvent.getWidth(),
-                // resizeEvent.getHeight());
             }
         }
     }
