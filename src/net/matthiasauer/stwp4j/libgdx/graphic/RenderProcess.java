@@ -97,10 +97,15 @@ public final class RenderProcess extends LightweightProcess {
                 this.camera, this.spriteBatch, this.interactionSubProcess);
         this.renderTextSubSystem = new RenderTextSubSystem(this.viewport, this.camera, this.spriteBatch,
                 this.interactionSubProcess);
-
+/*
 this.camera.zoom = 2;
 this.camera.update();
+*/
 
+        //this.camera.translate(new Vector2(250, 0));
+        //this.camera.update();
+        
+        
 
         // create the PriorityQueue with the custom comparator and an initial
         // size
@@ -128,10 +133,13 @@ this.camera.update();
                     // do nothing
                     this.viewport.setWorldSize(this.initalCameraWidth, this.initalCameraHeight);
                     this.viewport.setScreenSize(resizeEvent.getWidth(), resizeEvent.getHeight());
+                    this.viewport.apply(true);
                     break;
                 case ChangeResolution:
                     // change resolution
+                    this.viewport.setWorldSize(resizeEvent.getWidth(), resizeEvent.getHeight());
                     this.viewport.update(resizeEvent.getWidth(), resizeEvent.getHeight());
+                    this.viewport.apply(true);
                     break;
                 case KeepResolutionKeepAspect:
                     // keep resolution but also keep the aspect
@@ -160,8 +168,7 @@ this.camera.update();
                     this.viewport.setScreenPosition(viewportX2, viewportY2);
                     this.viewport.setScreenSize(viewportWidth2, viewportHeight2);
                     this.viewport.setWorldSize(viewportWidth2, viewportHeight2);
-                    this.viewport.apply(true);
-                    
+                    this.viewport.apply(true);                    
                     break;
                 default:
                     break;
