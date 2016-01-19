@@ -90,9 +90,6 @@ class InteractionSubProcess implements InputProcessor {
             rectangle.x /= zoomFactor;
             rectangle.y /= zoomFactor;
 
-            // rectangle.x /= renderedComponent.getZoomFactor();
-            // rectangle.y /= renderedComponent.getZoomFactor();
-
             return rectangle;
         }
     }
@@ -136,45 +133,72 @@ class InteractionSubProcess implements InputProcessor {
         final Class<? extends RenderData> specializationType = renderData.getClass();
         boolean isProjected = renderData.isRenderProjected();
         Vector2 position = new Vector2(eventData.getPosition(isProjected));
-
-        position.x /= this.viewPort.getScreenWidth() / this.viewPort.getWorldWidth();
-        position.y /= this.viewPort.getScreenHeight() / this.viewPort.getWorldHeight();
         Rectangle rectangle = this.getRectangle(isProjected, renderedData);
+        boolean isHeightStretched = Math.abs(this.viewPort.getWorldHeight() - this.viewPort.getScreenHeight()) > 2;
+        boolean isWidthStretched = Math.abs(this.viewPort.getWorldWidth() - this.viewPort.getScreenWidth()) > 2;
+        boolean isStretched = isHeightStretched || isWidthStretched;
+        boolean widthAspectRatioKept = this.viewPort.getScreenX() != 0;
+        boolean heightAspectRatioKept = this.viewPort.getScreenY() != 0;
+        boolean aspectRatioKept = widthAspectRatioKept || heightAspectRatioKept;
 
-        Vector2 unProjectedPosition = new Vector2(eventData.getPosition(false));
-        unProjectedPosition.x /= this.viewPort.getScreenWidth() / this.viewPort.getWorldWidth();
-        unProjectedPosition.y /= this.viewPort.getScreenHeight() / this.viewPort.getWorldHeight();
+        if (!isStretched || !isProjected || aspectRatioKept) {
+            if (!(isProjected && isStretched && aspectRatioKept)) {
+                position.x /= this.viewPort.getScreenWidth() / this.viewPort.getWorldWidth();
+                position.y /= this.viewPort.getScreenHeight() / this.viewPort.getWorldHeight();
+            }
 
-        // if the mouse is beyond the screen (f.e. stretched but ratio is kept)
-        if (Math.abs(unProjectedPosition.x) > Math.abs(this.camera.viewportWidth / 2)) {
-            // there can't be any entity because there is nothing rendered there
-            // !
-            return false;
-        }
+            Vector2 unProjectedPosition = new Vector2(eventData.getPosition(false));
+            unProjectedPosition.x /= this.viewPort.getScreenWidth() / this.viewPort.getWorldWidth();
+            unProjectedPosition.y /= this.viewPort.getScreenHeight() / this.viewPort.getWorldHeight();
 
-        // if the mouse is beyond the screen (f.e. stretched but ratio is kept)
-        if (Math.abs(unProjectedPosition.y) > Math.abs(this.camera.viewportHeight / 2)) {
-            // there can't be any entity because there is nothing rendered there
-            // !
-            return false;
+            // if the mouse is beyond the screen (f.e. stretched but ratio is
+            // kept)
+            if (Math.abs(unProjectedPosition.x) > Math.abs(this.camera.viewportWidth / 2)) {
+                // there can't be any entity because there is nothing rendered
+                // there
+                // !
+                return false;
+            }
+
+            // if the mouse is beyond the screen (f.e. stretched but ratio is
+            // kept)
+            if (Math.abs(unProjectedPosition.y) > Math.abs(this.camera.viewportHeight / 2)) {
+                // there can't be any entity because there is nothing rendered
+                // there
+                // !
+                return false;
+            }
         }
 
         if (isProjected) {
             float realX = this.viewPort.getScreenX() * 2 + this.viewPort.getScreenWidth();
             float realY = this.viewPort.getScreenY() * 2 + this.viewPort.getScreenHeight();
 
-            position.x /= this.viewPort.getScreenWidth() / realX;
-            position.y /= this.viewPort.getScreenHeight() / realY;
+            if (isStretched && aspectRatioKept) {
+                float widthFactor = this.viewPort.getWorldWidth() / realX;
+                float heightFactor = this.viewPort.getWorldHeight() / realY;
 
-            position.x -= this.viewPort.getScreenX();
-            position.y -= this.viewPort.getScreenY();
+                position.x -= this.viewPort.getScreenX() * widthFactor;
+                position.y -= this.viewPort.getScreenY() * heightFactor;
+
+                float widthFactor2 = this.viewPort.getScreenWidth() / realX;
+                float heightFactor2 = this.viewPort.getScreenHeight() / realY;
+                position.x /= widthFactor2;
+                position.y /= heightFactor2;
+            } else {
+                position.x /= this.viewPort.getScreenWidth() / realX;
+                position.y /= this.viewPort.getScreenHeight() / realY;
+
+                position.x -= this.viewPort.getScreenX();
+                position.y -= this.viewPort.getScreenY();
+            }
         }
 
         if (renderData.getRotation() != 0) {
             // get a new 'rotated vector'
             position = this.rotatePosition(position, rectangle, renderData.getRotation(), specializationType);
         }
-
+        // System.err.println(position);
         // if in the bounding box
         if (rectangle.contains(position)) {
             if (specializationType == TextRenderData.class) {
