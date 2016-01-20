@@ -97,10 +97,12 @@ public final class RenderProcess extends LightweightProcess {
                 this.camera, this.spriteBatch, this.interactionSubProcess);
         this.renderTextSubSystem = new RenderTextSubSystem(this.viewport, this.camera, this.spriteBatch,
                 this.interactionSubProcess);
-/*
-this.camera.zoom = 2;
+        
+// zoom doesn't work as well as translate !!!
+this.camera.translate(new Vector2(250, 0));
+this.camera.zoom = 0.75f;
 this.camera.update();
-*/
+
 
         //this.camera.translate(new Vector2(250, 0));
         //this.camera.update();
