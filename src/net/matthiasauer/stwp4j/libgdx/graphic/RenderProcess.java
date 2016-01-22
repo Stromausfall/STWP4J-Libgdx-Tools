@@ -97,11 +97,6 @@ public final class RenderProcess extends LightweightProcess {
                 this.camera, this.spriteBatch, this.interactionSubProcess);
         this.renderTextSubSystem = new RenderTextSubSystem(this.viewport, this.camera, this.spriteBatch,
                 this.interactionSubProcess);
-        
-// zoom doesn't work as well as translate !!!
-this.camera.translate(new Vector2(250, 0));
-this.camera.zoom = 0.75f;
-this.camera.update();
 
 
         //this.camera.translate(new Vector2(250, 0));
@@ -194,16 +189,16 @@ this.camera.update();
             this.interactionSubProcess.preIteration();
         }
     }
-
+    
     @Override
     protected void postIteration() {
         Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        this.spriteBatch.begin();
-        this.changeProjection(true);
-        boolean lastProjectedValue = true;
         final float originalZoom = this.camera.zoom;
+        this.spriteBatch.begin();
+        this.changeProjection(true, originalZoom);
+        boolean lastProjectedValue = true;
 
         // iterate over the keys in order (that's what the treemap is for)
         while (!this.sortedRenderComponents.isEmpty()) {
@@ -213,7 +208,7 @@ this.camera.update();
             if (lastProjectedValue != projected) {
                 lastProjectedValue = projected;
 
-                this.changeProjection(projected);
+                this.changeProjection(projected, originalZoom);
             }
 
             if (baseRenderComponent instanceof SpriteRenderData) {
@@ -239,12 +234,12 @@ this.camera.update();
         }
     }
 
-    private void changeProjection(boolean renderProjected) {
+    private void changeProjection(boolean renderProjected, float originalZoom) {
         // end
         this.spriteBatch.end();
 
         if (renderProjected) {
-            this.camera.zoom = this.camera.zoom;
+            this.camera.zoom = originalZoom;
             this.camera.update();
 
             this.spriteBatch.setProjectionMatrix(this.camera.combined);
