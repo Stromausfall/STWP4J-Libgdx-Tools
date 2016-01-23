@@ -98,9 +98,6 @@ public final class RenderProcess extends LightweightProcess {
         this.renderTextSubSystem = new RenderTextSubSystem(this.viewport, this.camera, this.spriteBatch,
                 this.interactionSubProcess);
 
-
-        //this.camera.translate(new Vector2(250, 0));
-        //this.camera.update();
         
         
 
@@ -188,7 +185,19 @@ public final class RenderProcess extends LightweightProcess {
         if (this.createInputTouchEvents) {
             this.interactionSubProcess.preIteration();
         }
+        
+/*
+counter++;
+
+if (counter < 750) {
+this.camera.translate(new Vector2(-0.1f, -0.015f));
+this.camera.zoom = 0.75f;
+//this.camera.zoom = 1.25f;
+this.camera.update();
+}*/
     }
+    
+long counter = 0;
     
     @Override
     protected void postIteration() {
