@@ -170,7 +170,15 @@ public final class RenderProcess extends LightweightProcess {
             }
         }
     }
-
+/*
+ * ERROR INFO :
+ * - when resizing - the error margin is somehow reset ?!
+ * - if not moving anymore the error persists, but after resizing the error disappears
+ * 
+ * ????
+ * 
+ */
+    
     @Override
     protected void execute() {
         this.handleRenderDataChannel();
@@ -186,15 +194,15 @@ public final class RenderProcess extends LightweightProcess {
             this.interactionSubProcess.preIteration();
         }
         
-/*
+
 counter++;
 
 if (counter < 750) {
-this.camera.translate(new Vector2(-0.1f, -0.015f));
+this.camera.translate(new Vector2(-0.2f, -0.015f));
 this.camera.zoom = 0.75f;
 //this.camera.zoom = 1.25f;
 this.camera.update();
-}*/
+}
     }
     
 long counter = 0;

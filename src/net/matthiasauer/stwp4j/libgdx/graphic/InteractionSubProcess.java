@@ -198,7 +198,7 @@ class InteractionSubProcess implements InputProcessor {
             // get a new 'rotated vector'
             position = this.rotatePosition(position, rectangle, renderData.getRotation(), specializationType);
         }
-        // System.err.println(position);
+
         // if in the bounding box
         if (rectangle.contains(position)) {
             if (specializationType == TextRenderData.class) {

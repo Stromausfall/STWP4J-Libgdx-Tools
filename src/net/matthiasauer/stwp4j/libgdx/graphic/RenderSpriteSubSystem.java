@@ -35,9 +35,7 @@ class RenderSpriteSubSystem {
         float originX = width / 2;
         float originY = height / 2;
 
-System.err.println(this.camera.position);
         if (!data.isRenderProjected()) {
-System.err.println(data.getTextureName());
             actualPositionX *= this.camera.zoom;
             actualPositionY *= this.camera.zoom;
             originX *= this.camera.zoom;
