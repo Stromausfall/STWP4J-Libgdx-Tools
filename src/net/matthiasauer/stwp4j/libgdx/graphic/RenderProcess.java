@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -121,6 +122,10 @@ public final class RenderProcess extends LightweightProcess {
         while ((event = this.applicationEventChannel.poll()) != null) {
             if (event.getApplicationEventType() == ApplicationEventType.RESIZE) {
                 ResizeApplicationEvent resizeEvent = (ResizeApplicationEvent) event;
+                
+                // save camera settings
+                final float preResizeZoom = this.camera.zoom;
+                final Vector3 preResizePosition = new Vector3(this.camera.position);
 
                 switch (this.resizeBehavior) {
                 case KeepResolution:
@@ -148,7 +153,7 @@ public final class RenderProcess extends LightweightProcess {
                     this.viewport.setScreenSize(viewportWidth, viewportHeight);
                     this.viewport.setWorldSize(this.initalCameraWidth, this.initalCameraHeight);
                     this.viewport.apply(true);
-                    
+System.err.println(this.viewport.getScreenX() + "/" + this.viewport.getScreenY() + " - " + this.viewport.getScreenWidth() + "/" + this.viewport.getScreenHeight());
                     break;
                 case ChangeResolutionKeepAspect:
                     // change resolution but also keep the aspect
@@ -167,6 +172,12 @@ public final class RenderProcess extends LightweightProcess {
                 default:
                     break;
                 }
+                
+                // restore camera settings
+                this.camera.position.set(preResizePosition);
+                this.camera.zoom = preResizeZoom;
+                this.camera.update();
+System.err.println("POST " + this.camera.position);
             }
         }
     }
@@ -197,7 +208,7 @@ public final class RenderProcess extends LightweightProcess {
 
 counter++;
 
-if (counter < 750) {
+if (counter < 2500) {
 this.camera.translate(new Vector2(-0.2f, -0.015f));
 this.camera.zoom = 0.75f;
 //this.camera.zoom = 1.25f;
