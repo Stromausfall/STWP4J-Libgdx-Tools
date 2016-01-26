@@ -8,6 +8,7 @@ import java.util.Set;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -22,14 +23,14 @@ import net.matthiasauer.stwp4j.libgdx.utils.InputTools;
 class InteractionSubProcess implements InputProcessor {
     private final Collection<InputTouchEvent> lastEvents;
     private final Set<RenderedData> renderedData;
-    private final Camera camera;
+    private final OrthographicCamera camera;
     private final RenderTextureArchiveSystem archive;
     private final Vector3 temp;
     private final Vector2 projected;
     private final Vector2 unprojected;
     private final Viewport viewPort;
 
-    public InteractionSubProcess(Camera camera, Viewport viewPort) {
+    public InteractionSubProcess(OrthographicCamera camera, Viewport viewPort) {
         this.archive = new RenderTextureArchiveSystem();
         this.renderedData = new HashSet<RenderedData>();
         this.lastEvents = new ArrayList<InputTouchEvent>();
@@ -175,6 +176,18 @@ class InteractionSubProcess implements InputProcessor {
             float realY = this.viewPort.getScreenY() * 2 + this.viewPort.getScreenHeight();
 
             if (isStretched && aspectRatioKept) {
+                float factorX = realX / this.viewPort.getScreenWidth();
+                float factorY = realY / this.viewPort.getScreenHeight();
+
+                position.x *= factorX;
+                position.y *= factorY;
+                
+
+                /*
+
+                position.x *= this.viewPort.getWorldWidth() / realX;
+                position.y *= this.viewPort.getWorldHeight() / realY;
+
                 float widthFactor = this.viewPort.getWorldWidth() / realX;
                 float heightFactor = this.viewPort.getWorldHeight() / realY;
 
@@ -184,7 +197,12 @@ class InteractionSubProcess implements InputProcessor {
                 float widthFactor2 = this.viewPort.getScreenWidth() / realX;
                 float heightFactor2 = this.viewPort.getScreenHeight() / realY;
                 position.x /= widthFactor2;
-                position.y /= heightFactor2;
+                position.y /= heightFactor2;*/
+                
+                //position.x -= this.camera.position.x * factorX;
+                
+System.err.println(factorX + " ===> " + position + " | " + this.viewPort.getScreenX() + " - " + this.viewPort.getScreenWidth() + " - " + this.camera.position.x);
+
             } else {
                 position.x /= this.viewPort.getScreenWidth() / realX;
                 position.y /= this.viewPort.getScreenHeight() / realY;

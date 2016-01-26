@@ -206,14 +206,19 @@ System.err.println("POST " + this.camera.position);
         }
         
 
-counter++;
-
+/*
 if (counter < 2500) {
 this.camera.translate(new Vector2(-0.2f, -0.015f));
 this.camera.zoom = 0.75f;
 //this.camera.zoom = 1.25f;
 this.camera.update();
+}*/
+if (counter == 0) {
+    //this.camera.zoom = 0.75f;
+    this.camera.translate(new Vector2(10, 0));
+    this.camera.update();
 }
+counter++;
     }
     
 long counter = 0;
