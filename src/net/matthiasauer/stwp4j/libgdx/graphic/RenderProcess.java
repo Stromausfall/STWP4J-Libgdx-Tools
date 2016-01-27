@@ -153,7 +153,6 @@ public final class RenderProcess extends LightweightProcess {
                     this.viewport.setScreenSize(viewportWidth, viewportHeight);
                     this.viewport.setWorldSize(this.initalCameraWidth, this.initalCameraHeight);
                     this.viewport.apply(true);
-System.err.println(this.viewport.getScreenX() + "/" + this.viewport.getScreenY() + " - " + this.viewport.getScreenWidth() + "/" + this.viewport.getScreenHeight());
                     break;
                 case ChangeResolutionKeepAspect:
                     // change resolution but also keep the aspect
@@ -177,19 +176,10 @@ System.err.println(this.viewport.getScreenX() + "/" + this.viewport.getScreenY()
                 this.camera.position.set(preResizePosition);
                 this.camera.zoom = preResizeZoom;
                 this.camera.update();
-System.err.println("POST " + this.camera.position);
             }
         }
     }
-/*
- * ERROR INFO :
- * - when resizing - the error margin is somehow reset ?!
- * - if not moving anymore the error persists, but after resizing the error disappears
- * 
- * ????
- * 
- */
-    
+
     @Override
     protected void execute() {
         this.handleRenderDataChannel();
@@ -204,24 +194,7 @@ System.err.println("POST " + this.camera.position);
         if (this.createInputTouchEvents) {
             this.interactionSubProcess.preIteration();
         }
-        
-
-/*
-if (counter < 2500) {
-this.camera.translate(new Vector2(-0.2f, -0.015f));
-this.camera.zoom = 0.75f;
-//this.camera.zoom = 1.25f;
-this.camera.update();
-}*/
-if (counter == 0) {
-    //this.camera.zoom = 0.75f;
-    this.camera.translate(new Vector2(10, 0));
-    this.camera.update();
-}
-counter++;
     }
-    
-long counter = 0;
     
     @Override
     protected void postIteration() {

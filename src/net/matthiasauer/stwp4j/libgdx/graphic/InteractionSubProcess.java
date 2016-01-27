@@ -178,37 +178,29 @@ class InteractionSubProcess implements InputProcessor {
             if (isStretched && aspectRatioKept) {
                 float factorX = realX / this.viewPort.getScreenWidth();
                 float factorY = realY / this.viewPort.getScreenHeight();
+                
+                // first remove the camera translation
+                position.x -= this.camera.position.x;
+                position.y -= this.camera.position.y;
 
+                // scale position
                 position.x *= factorX;
                 position.y *= factorY;
                 
-
-                /*
-
-                position.x *= this.viewPort.getWorldWidth() / realX;
-                position.y *= this.viewPort.getWorldHeight() / realY;
-
-                float widthFactor = this.viewPort.getWorldWidth() / realX;
-                float heightFactor = this.viewPort.getWorldHeight() / realY;
-
-                position.x -= this.viewPort.getScreenX() * widthFactor;
-                position.y -= this.viewPort.getScreenY() * heightFactor;
-
-                float widthFactor2 = this.viewPort.getScreenWidth() / realX;
-                float heightFactor2 = this.viewPort.getScreenHeight() / realY;
-                position.x /= widthFactor2;
-                position.y /= heightFactor2;*/
-                
-                //position.x -= this.camera.position.x * factorX;
-                
-System.err.println(factorX + " ===> " + position + " | " + this.viewPort.getScreenX() + " - " + this.viewPort.getScreenWidth() + " - " + this.camera.position.x);
-
+                // restore camera translation
+                position.x += this.camera.position.x;
+                position.y += this.camera.position.y;
             } else {
+                // first remove the camera translation
+                position.x -= this.camera.position.x;
+                position.y -= this.camera.position.y;
+                
                 position.x /= this.viewPort.getScreenWidth() / realX;
                 position.y /= this.viewPort.getScreenHeight() / realY;
 
-                position.x -= this.viewPort.getScreenX();
-                position.y -= this.viewPort.getScreenY();
+                // restore camera translation
+                position.x += this.camera.position.x;
+                position.y += this.camera.position.y;
             }
         }
 
