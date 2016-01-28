@@ -11,6 +11,19 @@ public class InputTouchEvent implements Poolable {
     private InputTouchEventType inputType;
     private boolean isTouched;
     private int argument;
+    
+    public InputTouchEvent() {
+    }
+    
+    public InputTouchEvent(InputTouchEvent element) {
+        this.projected.set(element.projected);
+        this.unprojected.set(element.unprojected);
+        this.isProjected = element.isProjected;
+        this.touchedRenderDataId = element.touchedRenderDataId;
+        this.inputType = element.inputType;
+        this.isTouched = element.isTouched;
+        this.argument = element.argument;
+    }
 
     public InputTouchEvent set(InputTouchEventType inputType, int argument, boolean isTouched, Vector2 projected,
             Vector2 unprojected) {

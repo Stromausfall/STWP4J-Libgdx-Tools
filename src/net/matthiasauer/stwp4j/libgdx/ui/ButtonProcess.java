@@ -100,6 +100,7 @@ public class ButtonProcess extends LightweightProcess {
         InputTouchEvent inputTouchEventData = null;
 
         while ((inputTouchEventData = this.touchEventInput.poll()) != null) {
+System.err.println("oi oi ! - " + inputTouchEventData.getInputTouchEventType());
             final String targetId = inputTouchEventData.getTouchedRenderDataId();
             final InputTouchEventType eventType = inputTouchEventData.getInputTouchEventType();
             final boolean isTouched = inputTouchEventData.isTouched();

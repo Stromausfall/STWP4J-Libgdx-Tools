@@ -99,9 +99,6 @@ public final class RenderProcess extends LightweightProcess {
         this.renderTextSubSystem = new RenderTextSubSystem(this.viewport, this.camera, this.spriteBatch,
                 this.interactionSubProcess);
 
-        
-        
-
         // create the PriorityQueue with the custom comparator and an initial
         // size
         this.sortedRenderComponents = new PriorityQueue<RenderData>(sortedRenderComponentsInitialSize,
@@ -194,6 +191,10 @@ public final class RenderProcess extends LightweightProcess {
         if (this.createInputTouchEvents) {
             this.interactionSubProcess.preIteration();
         }
+
+System.err.println("XXXXX !");
+this.camera.translate(new Vector2(-0.25f, 0));
+this.camera.update();
     }
     
     @Override

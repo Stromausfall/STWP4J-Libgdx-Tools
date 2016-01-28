@@ -1,7 +1,6 @@
 package net.matthiasauer.stwp4j.libgdx.graphic;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +20,7 @@ import net.matthiasauer.stwp4j.ChannelOutPort;
 import net.matthiasauer.stwp4j.libgdx.utils.InputTools;
 
 class InteractionSubProcess implements InputProcessor {
-    private final Collection<InputTouchEvent> lastEvents;
+    private final ArrayList<InputTouchEvent> lastEvents;
     private final Set<RenderedData> renderedData;
     private final OrthographicCamera camera;
     private final RenderTextureArchiveSystem archive;
@@ -29,6 +28,7 @@ class InteractionSubProcess implements InputProcessor {
     private final Vector2 projected;
     private final Vector2 unprojected;
     private final Viewport viewPort;
+    private InputTouchEvent lastIterationLastEvent = null;
 
     public InteractionSubProcess(OrthographicCamera camera, Viewport viewPort) {
         this.archive = new RenderTextureArchiveSystem();
@@ -59,6 +59,18 @@ class InteractionSubProcess implements InputProcessor {
     public void postIteration(ChannelOutPort<InputTouchEvent> outPort) {
         RenderedData touchedRenderedData = null;
 
+        // if no event would be fired - 
+        if (this.lastEvents.isEmpty()) {
+            if (this.lastIterationLastEvent != null) {
+                // copy the event and add it
+                InputTouchEvent event = new InputTouchEvent(this.lastIterationLastEvent);
+                event.set(InputTouchEventType.NoChange, event.getArgument(), event.isTouched(), event.getPosition(true),
+                        event.getPosition(false));
+
+                this.lastEvents.add(event);
+            }
+        }
+
         for (InputTouchEvent eventToProcess : this.lastEvents) {
 
             if (touchedRenderedData == null) {
@@ -72,6 +84,9 @@ class InteractionSubProcess implements InputProcessor {
             }
 
             outPort.offer(eventToProcess);
+
+            // store the last event
+            this.lastIterationLastEvent = eventToProcess;
         }
 
         this.lastEvents.clear();
@@ -178,7 +193,7 @@ class InteractionSubProcess implements InputProcessor {
             if (isStretched && aspectRatioKept) {
                 float factorX = realX / this.viewPort.getScreenWidth();
                 float factorY = realY / this.viewPort.getScreenHeight();
-                
+
                 // first remove the camera translation
                 position.x -= this.camera.position.x;
                 position.y -= this.camera.position.y;
@@ -186,7 +201,7 @@ class InteractionSubProcess implements InputProcessor {
                 // scale position
                 position.x *= factorX;
                 position.y *= factorY;
-                
+
                 // restore camera translation
                 position.x += this.camera.position.x;
                 position.y += this.camera.position.y;
@@ -194,7 +209,7 @@ class InteractionSubProcess implements InputProcessor {
                 // first remove the camera translation
                 position.x -= this.camera.position.x;
                 position.y -= this.camera.position.y;
-                
+
                 position.x /= this.viewPort.getScreenWidth() / realX;
                 position.y /= this.viewPort.getScreenHeight() / realY;
 
