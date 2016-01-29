@@ -7,6 +7,8 @@ public class InputTouchEvent implements Poolable {
     private final Vector2 projected = new Vector2();
     private final Vector2 unprojected = new Vector2();
     private boolean isProjected;
+    private int screenX;
+    private int screenY;
     private String touchedRenderDataId;
     private InputTouchEventType inputType;
     private boolean isTouched;
@@ -14,19 +16,11 @@ public class InputTouchEvent implements Poolable {
     
     public InputTouchEvent() {
     }
-    
-    public InputTouchEvent(InputTouchEvent element) {
-        this.projected.set(element.projected);
-        this.unprojected.set(element.unprojected);
-        this.isProjected = element.isProjected;
-        this.touchedRenderDataId = element.touchedRenderDataId;
-        this.inputType = element.inputType;
-        this.isTouched = element.isTouched;
-        this.argument = element.argument;
-    }
 
-    public InputTouchEvent set(InputTouchEventType inputType, int argument, boolean isTouched, Vector2 projected,
+    public InputTouchEvent set(int screenX, int screenY, InputTouchEventType inputType, int argument, boolean isTouched, Vector2 projected,
             Vector2 unprojected) {
+        this.screenX = screenX;
+        this.screenY = screenY;
         this.inputType = inputType;
         this.argument = argument;
         this.projected.set(projected);
@@ -34,6 +28,14 @@ public class InputTouchEvent implements Poolable {
         this.isTouched = isTouched;
 
         return this;
+    }
+    
+    public int getScreenX() {
+        return this.screenX;
+    }
+    
+    public int getScreenY() {
+        return this.screenY;
     }
 
     public InputTouchEventType getInputTouchEventType() {

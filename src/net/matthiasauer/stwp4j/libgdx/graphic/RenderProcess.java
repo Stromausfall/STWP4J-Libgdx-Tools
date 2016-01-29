@@ -191,10 +191,6 @@ public final class RenderProcess extends LightweightProcess {
         if (this.createInputTouchEvents) {
             this.interactionSubProcess.preIteration();
         }
-
-System.err.println("XXXXX !");
-this.camera.translate(new Vector2(-0.25f, 0));
-this.camera.update();
     }
     
     @Override

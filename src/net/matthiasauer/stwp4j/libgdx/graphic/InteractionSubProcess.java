@@ -62,12 +62,11 @@ class InteractionSubProcess implements InputProcessor {
         // if no event would be fired - 
         if (this.lastEvents.isEmpty()) {
             if (this.lastIterationLastEvent != null) {
-                // copy the event and add it
-                InputTouchEvent event = new InputTouchEvent(this.lastIterationLastEvent);
-                event.set(InputTouchEventType.NoChange, event.getArgument(), event.isTouched(), event.getPosition(true),
-                        event.getPosition(false));
-
-                this.lastEvents.add(event);
+                this.saveEvent(
+                        (int) this.lastIterationLastEvent.getScreenX(),
+                        (int) this.lastIterationLastEvent.getScreenY(),
+                        this.lastIterationLastEvent.getInputTouchEventType(),
+                        this.lastIterationLastEvent.getArgument());
             }
         }
 
@@ -328,7 +327,7 @@ class InteractionSubProcess implements InputProcessor {
 
         this.calculatePositions(camera, screenX, screenY);
 
-        event.set(inputType, argument, Gdx.input.isTouched(), this.projected, this.unprojected);
+        event.set(screenX, screenY, inputType, argument, Gdx.input.isTouched(), this.projected, this.unprojected);
 
         this.lastEvents.add(event);
     }
