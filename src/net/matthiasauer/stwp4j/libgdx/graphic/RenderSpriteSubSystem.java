@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 class RenderSpriteSubSystem {
@@ -57,8 +56,8 @@ class RenderSpriteSubSystem {
             this.spriteBatch.setColor(base);
         }
 
-        this.interactionSubProcess.addRenderedData(Pools.get(RenderedData.class).obtain().set(actualPositionX,
-                actualPositionY, texture.getRegionWidth(), texture.getRegionHeight(), this.camera.zoom, data, texture));
+        this.interactionSubProcess.addRenderedData(new RenderedData(actualPositionX, actualPositionY,
+                texture.getRegionWidth(), texture.getRegionHeight(), this.camera.zoom, data, texture));
     }
 
 }

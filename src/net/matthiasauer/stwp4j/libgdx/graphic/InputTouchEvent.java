@@ -1,9 +1,8 @@
 package net.matthiasauer.stwp4j.libgdx.graphic;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Pool.Poolable;
 
-public class InputTouchEvent implements Poolable {
+public class InputTouchEvent {
     private final Vector2 projected = new Vector2();
     private final Vector2 unprojected = new Vector2();
     private boolean isProjected;
@@ -14,10 +13,7 @@ public class InputTouchEvent implements Poolable {
     private boolean isTouched;
     private int argument;
     
-    public InputTouchEvent() {
-    }
-
-    public InputTouchEvent set(int screenX, int screenY, InputTouchEventType inputType, int argument, boolean isTouched, Vector2 projected,
+    public InputTouchEvent(int screenX, int screenY, InputTouchEventType inputType, int argument, boolean isTouched, Vector2 projected,
             Vector2 unprojected) {
         this.screenX = screenX;
         this.screenY = screenY;
@@ -26,8 +22,6 @@ public class InputTouchEvent implements Poolable {
         this.projected.set(projected);
         this.unprojected.set(unprojected);
         this.isTouched = isTouched;
-
-        return this;
     }
     
     public int getScreenX() {
@@ -72,16 +66,5 @@ public class InputTouchEvent implements Poolable {
 
     public boolean isTouched() {
         return this.isTouched;
-    }
-
-    @Override
-    public void reset() {
-        this.inputType = null;
-        this.argument = 0;
-        this.projected.set(0, 0);
-        this.unprojected.set(0, 0);
-        this.isProjected = false;
-        this.isTouched = false;
-        this.touchedRenderDataId = null;
     }
 }

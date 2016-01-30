@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import net.matthiasauer.stwp4j.libgdx.utils.Pair;
@@ -119,8 +118,8 @@ class RenderTextSubSystem {
         this.spriteBatch.setTransformMatrix(oldMatrix);
         spriteBatch.begin();
 
-        this.interactionSubProcess.addRenderedData(
-                Pools.get(RenderedData.class).obtain().set(actualPositionX, actualPositionY - glyphLayout.height,
+        this.interactionSubProcess
+                .addRenderedData(new RenderedData(actualPositionX, actualPositionY - glyphLayout.height,
                         glyphLayout.width, glyphLayout.height, this.camera.zoom, data, null));
     }
 }

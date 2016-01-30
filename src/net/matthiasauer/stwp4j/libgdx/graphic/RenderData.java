@@ -12,7 +12,7 @@ public abstract class RenderData {
     private int renderOrder;
     private boolean renderProjected;
     
-    protected void set(
+    protected RenderData(
             String id,
             float positionX,
             float positionY,

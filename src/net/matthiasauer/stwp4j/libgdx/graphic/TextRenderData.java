@@ -1,13 +1,12 @@
 package net.matthiasauer.stwp4j.libgdx.graphic;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Pool.Poolable;
 
-public final class TextRenderData extends RenderData implements Poolable {
+public final class TextRenderData extends RenderData {
     private String textString;
     private String textFont;
 
-    public TextRenderData set(
+    public TextRenderData(
             String id,
             float positionX,
             float positionY,
@@ -18,11 +17,9 @@ public final class TextRenderData extends RenderData implements Poolable {
             boolean renderProjected,
             String textString,
             String textFont) {
-        this.set(id, positionX, positionY, rotation, renderPositionUnit, tint, renderOrder, renderProjected);
+        super(id, positionX, positionY, rotation, renderPositionUnit, tint, renderOrder, renderProjected);
         this.textString = textString;
         this.textFont = textFont;
-        
-        return this;
     }
     
     public String getTextString() {
@@ -31,10 +28,5 @@ public final class TextRenderData extends RenderData implements Poolable {
     
     public String getTextFont() {
         return this.textFont;
-    }
-
-    @Override
-    public void reset() {
-        this.set(null, 0, 0, 0, null, null, 0, false, null, null);
     }
 }

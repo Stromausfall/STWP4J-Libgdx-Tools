@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import net.matthiasauer.stwp4j.ChannelOutPort;
@@ -45,10 +44,6 @@ class InteractionSubProcess implements InputProcessor {
     }
 
     public void preIteration() {
-        for (RenderedData data : this.renderedData) {
-            Pools.get(RenderedData.class).free(data);
-        }
-
         this.renderedData.clear();
     }
 
@@ -59,11 +54,10 @@ class InteractionSubProcess implements InputProcessor {
     public void postIteration(ChannelOutPort<InputTouchEvent> outPort) {
         RenderedData touchedRenderedData = null;
 
-        // if no event would be fired - 
+        // if no event would be fired -
         if (this.lastEvents.isEmpty()) {
             if (this.lastIterationLastEvent != null) {
-                this.saveEvent(
-                        (int) this.lastIterationLastEvent.getScreenX(),
+                this.saveEvent((int) this.lastIterationLastEvent.getScreenX(),
                         (int) this.lastIterationLastEvent.getScreenY(),
                         this.lastIterationLastEvent.getInputTouchEventType(),
                         this.lastIterationLastEvent.getArgument());
@@ -323,11 +317,10 @@ class InteractionSubProcess implements InputProcessor {
     }
 
     private void saveEvent(int screenX, int screenY, InputTouchEventType inputType, int argument) {
-        InputTouchEvent event = Pools.get(InputTouchEvent.class).obtain();
-
         this.calculatePositions(camera, screenX, screenY);
 
-        event.set(screenX, screenY, inputType, argument, Gdx.input.isTouched(), this.projected, this.unprojected);
+        InputTouchEvent event = new InputTouchEvent(screenX, screenY, inputType, argument, Gdx.input.isTouched(),
+                this.projected, this.unprojected);
 
         this.lastEvents.add(event);
     }

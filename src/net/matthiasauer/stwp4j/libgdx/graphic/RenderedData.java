@@ -9,7 +9,7 @@ public class RenderedData {
 	private RenderData renderData;
 	private AtlasRegion texture;
 	
-	public RenderedData set(float x, float y, float width, float height, float zoomFactor, RenderData renderData, AtlasRegion texture) {
+	public RenderedData(float x, float y, float width, float height, float zoomFactor, RenderData renderData, AtlasRegion texture) {
 		this.renderedTarget.x = x;
 		this.renderedTarget.y = y;
 		this.renderedTarget.width = width;
@@ -17,8 +17,6 @@ public class RenderedData {
 		this.zoomFactor = zoomFactor;
 		this.renderData = renderData;
 		this.texture = texture;
-		
-		return this;
 	}
 	
 	public AtlasRegion getTexture() {

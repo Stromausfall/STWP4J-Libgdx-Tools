@@ -1,12 +1,11 @@
 package net.matthiasauer.stwp4j.libgdx.graphic;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.Pool.Poolable;
 
-public final class SpriteRenderData extends RenderData implements Poolable {
+public final class SpriteRenderData extends RenderData {
     private String textureName;
 
-    public SpriteRenderData set(
+    public SpriteRenderData(
             String id,
             float positionX,
             float positionY,
@@ -16,18 +15,11 @@ public final class SpriteRenderData extends RenderData implements Poolable {
             int renderOrder,
             boolean renderProjected,
             String textureName) {
-        this.set(id, positionX, positionY, rotation, renderPositionUnit, tint, renderOrder, renderProjected);
+        super(id, positionX, positionY, rotation, renderPositionUnit, tint, renderOrder, renderProjected);
         this.textureName = textureName;
-        
-        return this;
     }
     
     public String getTextureName() {
         return this.textureName;
-    }
-
-    @Override
-    public void reset() {
-        this.set(null, 0, 0, 0, null, null, 0, false);
     }
 }
