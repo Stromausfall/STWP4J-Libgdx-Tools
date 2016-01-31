@@ -59,6 +59,8 @@ public final class RenderProcess extends LightweightProcess {
     private final ChannelInPort<RenderData> renderDataChannel;
     private final ChannelInPort<ApplicationEvent> applicationEventChannel;
     private final ChannelOutPort<InputTouchEvent> inputTouchEventDataChannel;
+    private final ChannelInPort<CameraChangeEvent> cameraChangeEventChannel;
+    private final ChannelOutPort<CameraStatusEvent> cameraStatusEventChannel;
     private final ResizeBehavior resizeBehavior;
     private final int initalCameraWidth;
     private final int initalCameraHeight;
@@ -76,18 +78,33 @@ public final class RenderProcess extends LightweightProcess {
      * @param initialCameraHeight
      *            the initial height the camera will have
      * @param resizeBehavior
-     *            determines the resize behavior
+     *            determines the resize behaviour
+     * @param renderDataChannel
+     *            receives the RenderData instances that will be rendered
+     * @param applicationEventChannel
+     *            receives the events from the Application - f.e. resize
+     * @param inputTouchEventDataChannel
+     *            produces input events generated from a mouse or touch input
+     * @param cameraChangeEventChannel
+     *            channel that allows changing the camera
+     * @param cameraStatusEventChannel
+     *            produces events after changing the camera that return the
+     *            status of the camera
      */
     public RenderProcess(List<String> atlasFilePaths, boolean createInputTouchEvents, int initialCameraWidth,
             int initialCameraHeight, ResizeBehavior resizeBehavior, ChannelInPort<RenderData> renderDataChannel,
             ChannelInPort<ApplicationEvent> applicationEventChannel,
-            ChannelOutPort<InputTouchEvent> inputTouchEventDataChannel) {
+            ChannelOutPort<InputTouchEvent> inputTouchEventDataChannel,
+            ChannelInPort<CameraChangeEvent> cameraChangeEventChannel,
+            ChannelOutPort<CameraStatusEvent> cameraStatusEventChannel) {
         this.initalCameraHeight = initialCameraHeight;
         this.initalCameraWidth = initialCameraWidth;
         this.inputTouchEventDataChannel = inputTouchEventDataChannel;
         this.applicationEventChannel = applicationEventChannel;
         this.renderDataChannel = renderDataChannel;
         this.resizeBehavior = resizeBehavior;
+        this.cameraChangeEventChannel = cameraChangeEventChannel;
+        this.cameraStatusEventChannel = cameraStatusEventChannel;
 
         this.createInputTouchEvents = createInputTouchEvents;
         this.camera = new OrthographicCamera(this.initalCameraWidth, this.initalCameraHeight);
@@ -119,7 +136,7 @@ public final class RenderProcess extends LightweightProcess {
         while ((event = this.applicationEventChannel.poll()) != null) {
             if (event.getApplicationEventType() == ApplicationEventType.RESIZE) {
                 ResizeApplicationEvent resizeEvent = (ResizeApplicationEvent) event;
-                
+
                 // save camera settings
                 final float preResizeZoom = this.camera.zoom;
                 final Vector3 preResizePosition = new Vector3(this.camera.position);
@@ -163,12 +180,12 @@ public final class RenderProcess extends LightweightProcess {
                     this.viewport.setScreenPosition(viewportX2, viewportY2);
                     this.viewport.setScreenSize(viewportWidth2, viewportHeight2);
                     this.viewport.setWorldSize(viewportWidth2, viewportHeight2);
-                    this.viewport.apply(true);                    
+                    this.viewport.apply(true);
                     break;
                 default:
                     break;
                 }
-                
+
                 // restore camera settings
                 this.camera.position.set(preResizePosition);
                 this.camera.zoom = preResizeZoom;
@@ -177,10 +194,24 @@ public final class RenderProcess extends LightweightProcess {
         }
     }
 
+    private void handleCameraChangeEventChannel() {
+        CameraChangeEvent event = null;
+
+        while ((event = this.cameraChangeEventChannel.poll()) != null) {
+            this.camera.translate(event.changeCameraXBy, event.changeCameraYBy);
+            this.camera.zoom += event.changeZoomBy;
+            this.camera.update();
+
+            this.cameraStatusEventChannel.offer(new CameraStatusEvent((int) this.camera.position.x,
+                    (int) this.camera.position.y, this.camera.zoom));
+        }
+    }
+
     @Override
     protected void execute() {
         this.handleRenderDataChannel();
         this.handleApplicationEventChannel();
+        this.handleCameraChangeEventChannel();
     }
 
     @Override
@@ -192,7 +223,7 @@ public final class RenderProcess extends LightweightProcess {
             this.interactionSubProcess.preIteration();
         }
     }
-    
+
     @Override
     protected void postIteration() {
         Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1);
